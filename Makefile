@@ -14,6 +14,7 @@ third_party_core: path \
 								  snappy \
                   sparsehash \
 									fastapprox	\
+									yaml-cpp \
 									eigen \
 									zeromq
 
@@ -23,7 +24,6 @@ third_party_all: third_party_core \
 									boost \
                   libconfig \
 									cuckoo \
-									yaml-cpp \
 									leveldb \
 									float_compressor
 
@@ -31,11 +31,7 @@ distclean:
 	rm -rf $(THIRD_PARTY_INCLUDE) $(THIRD_PARTY_LIB) $(THIRD_PARTY_BIN) \
 		$(THIRD_PARTY_SRC) $(THIRD_PARTY)/share
 
-# These might not build.
-third_party_unused: gtest \
-										iftop \
-
-.PHONY: third_party_core third_party_all third_party_unused distclean
+.PHONY: third_party_core third_party_all distclean
 
 path:
 	mkdir -p $(THIRD_PARTY_LIB)
@@ -239,37 +235,4 @@ $(ZMQ_LIB): $(ZMQ_SRC)
 	./configure --prefix=$(THIRD_PARTY); \
 	make install
 	cp $(THIRD_PARTY_CENTRAL)/zmq.hpp $(THIRD_PARTY_INCLUDE)
-
-
-####################### Unused #####################
-
-# ===================== gtest ====================
-
-GTEST_SRC = $(THIRD_PARTY_CENTRAL)/gtest-1.7.0.tar
-GTEST_LIB = $(THIRD_PARTY_LIB)/libgtest_main.a
-
-gtest: path $(GTEST_LIB)
-
-$(GTEST_LIB): $(GTEST_SRC)
-	tar xf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $<)/make; \
-	make; \
-	./sample1_unittest; \
-	cp -r ../include/* $(THIRD_PARTY_INCLUDE)/; \
-	cp gtest_main.a $@
-
-
-# ================== iftop ==================
-
-IFTOP_SRC = $(THIRD_PARTY_CENTRAL)/iftop-1.0pre4.tar.gz
-IFTOP_BIN = $(THIRD_PARTY_BIN)/iftop
-
-iftop: path $(IFTOP_BIN)
-
-$(IFTOP_BIN): $(IFTOP_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $<)); \
-	./configure --prefix=$(THIRD_PARTY); \
-	make install; \
-	cp iftop $(IFTOP_BIN)
 
