@@ -82,19 +82,28 @@ $(BOOST_INCLUDE): $(BOOST_B2)
 
 # ===================== cuckoo =====================
 
-CUCKOO_SRC = $(THIRD_PARTY_CENTRAL)/libcuckoo.tar
+CUCKOO_SRC = $(THIRD_PARTY_SRC)/libcuckoo
 CUCKOO_INCLUDE = $(THIRD_PARTY_INCLUDE)/libcuckoo
 
-cuckoo: path $(CUCKOO_SRC)
-	tar xf $(CUCKOO_SRC) -C $(THIRD_PARTY_SRC); \
-	cp -r $(THIRD_PARTY_SRC)/libcuckoo/libcuckoo $(THIRD_PARTY_INCLUDE)/
+$(CUCKOO_SRC):
+	cd $(THIRD_PARTY_SRC) && \
+	  git clone https://github.com/efficient/libcuckoo.git libcuckoo && \
+	  cd libcuckoo && \
+	  git checkout 99ee9348b81ad2def9fbac4676d15541adb1f748
 
 $(CUCKOO_INCLUDE): $(CUCKOO_SRC)
-	tar xf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	autoreconf -fis; \
-	./configure --prefix=$(THIRD_PARTY); \
-	make; make install
+	mkdir -p $@
+	cp -r $(THIRD_PARTY_SRC)/libcuckoo/src/* $(CUCKOO_INCLUDE)
+
+cuckoo: path $(CUCKOO_INCLUDE)
+
+#$(CUCKOO_INCLUDE): $(CUCKOO_SRC)
+#	cp -r $(THIRD_PARTY_SRC)/libcuckoo/libcuckoo $(THIRD_PARTY_INCLUDE)/
+#	tar xf $< -C $(THIRD_PARTY_SRC)
+#	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
+#	autoreconf -fis; \
+#	./configure --prefix=$(THIRD_PARTY); \
+#	make; make install
 
 # ==================== eigen ====================
 
