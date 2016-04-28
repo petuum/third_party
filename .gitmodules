@@ -22,3 +22,6 @@
 [submodule "src/yaml-cpp"]
 	path = src/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "src/oprofile"]
+	path = src/oprofile
+	url = git://git.code.sf.net/p/oprofile/oprofile

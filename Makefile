@@ -218,16 +218,16 @@ $(YAMLCPP_LIB): $(YAMLCPP_SRC)
 # =================== oprofile ===================
 # NOTE: need libpopt-dev binutils-dev
 
-OPROFILE_SRC = $(THIRD_PARTY_CENTRAL)/oprofile-1.0.0.tar.gz
+OPROFILE_SRC = $(THIRD_PARTY_SRC)/oprofile
 OPROFILE_LIB = $(THIRD_PARTY_LIB)/libprofiler.so
 
 oprofile: path $(OPROFILE_LIB)
 
 $(OPROFILE_LIB): $(OPROFILE_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	./configure --prefix=$(THIRD_PARTY); \
-	make install
+	cd $(OPROFILE_SRC); \
+	./autogen.sh && \
+	./configure --prefix=$(THIRD_PARTY) && \
+	$(MAKE) install
 
 # ================== sparsehash ==================
 
