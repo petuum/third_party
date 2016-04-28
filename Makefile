@@ -138,16 +138,15 @@ $(GFLAGS_LIB): $(GFLAGS_SRC)
 
 # ===================== glog =====================
 
-GLOG_SRC = $(THIRD_PARTY_CENTRAL)/glog-0.3.3.tar.gz
+GLOG_SRC = $(THIRD_PARTY_SRC)/glog
 GLOG_LIB = $(THIRD_PARTY_LIB)/libglog.so
 
 glog: $(GLOG_LIB)
 
 $(GLOG_LIB): $(GLOG_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
+	cd $(GLOG_SRC); \
 	./configure --prefix=$(THIRD_PARTY); \
-	make install
+	$(MAKE) install
 
 # ================== gperftools =================
 
