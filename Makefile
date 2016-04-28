@@ -86,18 +86,9 @@ CUCKOO_SRC = $(THIRD_PARTY_SRC)/libcuckoo
 CUCKOO_INCLUDE = $(THIRD_PARTY_INCLUDE)/libcuckoo
 
 $(CUCKOO_INCLUDE): $(CUCKOO_SRC)
-	mkdir -p $@
-	cp -r $(THIRD_PARTY_SRC)/libcuckoo/src/* $(CUCKOO_INCLUDE)
+	ln -s $(CUCKOO_SRC)/src $@
 
 cuckoo: path $(CUCKOO_INCLUDE)
-
-#$(CUCKOO_INCLUDE): $(CUCKOO_SRC)
-#	cp -r $(THIRD_PARTY_SRC)/libcuckoo/libcuckoo $(THIRD_PARTY_INCLUDE)/
-#	tar xf $< -C $(THIRD_PARTY_SRC)
-#	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-#	autoreconf -fis; \
-#	./configure --prefix=$(THIRD_PARTY); \
-#	make; make install
 
 # ==================== eigen ====================
 
