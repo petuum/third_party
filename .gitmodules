@@ -16,3 +16,6 @@
 [submodule "src/leveldb"]
 	path = src/leveldb
 	url = https://github.com/google/leveldb.git
+[submodule "src/libconfig"]
+	path = src/libconfig
+	url = https://github.com/hyperrealm/libconfig.git

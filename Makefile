@@ -181,16 +181,22 @@ $(LEVELDB_INCLUDE): leveldb_build
 
 # ==================== libconfig ===================
 
-LIBCONFIG_SRC = $(THIRD_PARTY_CENTRAL)/libconfig-1.4.9.tar.gz
+LIBCONFIG_TAR = $(THIRD_PARTY_CENTRAL)/libconfig-1.5.tar.gz
+LIBCONFIG_SRC = $(THIRD_PARTY_SRC)/libconfig-1.5
 LIBCONFIG_LIB = $(THIRD_PARTY_LIB)/libconfig++.so
 
 libconfig: path $(LIBCONFIG_LIB)
 
+$(LIBCONFIG_TAR):
+	wget http://www.hyperrealm.com/libconfig/libconfig-1.5.tar.gz -O $@
+
+$(LIBCONFIG_SRC): $(LIBCONFIG_TAR)
+	tar xf $< -C $(THIRD_PARTY_SRC)
+
 $(LIBCONFIG_LIB): $(LIBCONFIG_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	./configure --prefix=$(THIRD_PARTY) --enable-frame-pointers; \
-	make install
+	cd $(LIBCONFIG_SRC) && \
+	./configure --prefix=$(THIRD_PARTY) --enable-frame-pointers && \
+	$(MAKE) install
 
 # ==================== yaml-cpp ===================
 
