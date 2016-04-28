@@ -107,23 +107,22 @@ $(EIGEN_INCLUDE): $(EIGEN_SRC)
 
 # ==================== fastapprox ===================
 
-FASTAPPROX_SRC = $(THIRD_PARTY_CENTRAL)/fastapprox-0.3.2.tar.gz
-FASTAPPROX_INC = $(THIRD_PARTY_INCLUDE)/fastapprox
+FASTAPPROX_SRC = $(THIRD_PARTY_SRC)/fastapprox
+FASTAPPROX_INCLUDE = $(THIRD_PARTY_INCLUDE)/fastapprox
 
-fastapprox: path $(FASTAPPROX_INC)
+fastapprox: path $(FASTAPPROX_INCLUDE)
 
-$(FASTAPPROX_INC): $(FASTAPPROX_SRC)
-	tar xzf $< -C $(THIRD_PARTY_SRC)
-	mkdir $(THIRD_PARTY_INCLUDE)/fastapprox
-	cp $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<)))/src/*.h \
-		$(THIRD_PARTY_INCLUDE)/fastapprox
+$(FASTAPPROX_INCLUDE): $(FASTAPPROX_SRC)
+	ln -s $(FASTAPPROX_SRC)/fastapprox/src/ $@
 
 # ==================== float_compressor ====================
 
-FC_SRC = $(THIRD_PARTY_CENTRAL)/float16_compressor.hpp
+FC_INCLUDE = $(THIRD_PARTY_INCLUDE)/float16_compressor.hpp
 
-float_compressor: path
-	cp $(THIRD_PARTY_CENTRAL)/float16_compressor.hpp $(THIRD_PARTY_INCLUDE)/
+$(FC_INCLUDE):
+	wget http://www.cs.cmu.edu/~jinlianw/third_party/float16_compressor.hpp -O $@
+
+float_compressor: path $(FC_INCLUDE)
 
 # ===================== gflags ===================
 
