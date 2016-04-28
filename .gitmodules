@@ -13,3 +13,6 @@
 [submodule "src/gperftools"]
 	path = src/gperftools
 	url = https://github.com/gperftools/gperftools.git
+[submodule "src/leveldb"]
+	path = src/leveldb
+	url = https://github.com/google/leveldb.git

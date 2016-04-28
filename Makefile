@@ -163,18 +163,21 @@ $(GPERFTOOLS_LIB): $(GPERFTOOLS_SRC)
 
 # ==================== leveldb ===================
 
-LEVELDB_SRC = $(THIRD_PARTY_CENTRAL)/leveldb-1.18.tar.gz
+LEVELDB_SRC = $(THIRD_PARTY_SRC)/leveldb
 LEVELDB_LIB = $(THIRD_PARTY_LIB)/libleveldb.so
+LEVELDB_INCLUDE = $(THIRD_PARTY_INCLUDE)/leveldb
 
-leveldb: path $(LEVELDB_LIB)
+leveldb: path $(LEVELDB_LIB) $(LEVELDB_INCLUDE)
 
-$(LEVELDB_LIB): $(LEVELDB_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	LIBRARY_PATH=$(THIRD_PARTY_LIB):${LIBRARY_PATH} \
-	make; \
-	cp ./libleveldb.* $(THIRD_PARTY_LIB)/; \
-	cp -r include/* $(THIRD_PARTY_INCLUDE)/
+leveldb_build: LIBRARY_PATH=$(THIRD_PARTY_LIB):${LIBRARY_PATH}
+leveldb_build: $(LEVELDB_SRC) $(SNAPPY_LIB)
+	$(MAKE) -C $(LEVELDB_SRC)
+
+$(LEVELDB_LIB): leveldb_build
+	cp $(LEVELDB_SRC)/libleveldb.* $(THIRD_PARTY_LIB)
+
+$(LEVELDB_INCLUDE): leveldb_build
+	ln -s $(LEVELDB_SRC)/include $(LEVELDB_INCLUDE)
 
 # ==================== libconfig ===================
 
