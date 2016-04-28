@@ -201,17 +201,19 @@ $(LIBCONFIG_LIB): $(LIBCONFIG_SRC)
 
 # ==================== yaml-cpp ===================
 
-YAMLCPP_SRC = $(THIRD_PARTY_CENTRAL)/yaml-cpp-0.5.1.tar.gz
-YAMLCPP_MK = $(THIRD_PARTY_CENTRAL)/yaml-cpp.mk
+YAMLCPP_SRC = $(THIRD_PARTY_SRC)/yaml-cpp
+YAMLCPP_MK = $(THIRD_PARTY_SRC)/yaml-cpp.mk
 YAMLCPP_LIB = $(THIRD_PARTY_LIB)/libyaml-cpp.a
+YAMLCPP_INCLUDE = $(THIRD_PARTY_INCLUDE)/yaml-cpp
 
 yaml-cpp: boost $(YAMLCPP_LIB)
 
+$(YAMLCPP_INCLUDE): $(YAMLCPP_LIB)
+	ln -s $(YAMLCPP_SRC)/include $(YAMLCPP_INCLUDE)
+
 $(YAMLCPP_LIB): $(YAMLCPP_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	make -f $(YAMLCPP_MK) BOOST_PREFIX=$(THIRD_PARTY) TARGET=$@; \
-	cp -r include/* $(THIRD_PARTY_INCLUDE)/
+	cd $(YAMLCPP_SRC); \
+	$(MAKE) -f $(YAMLCPP_MK) BOOST_PREFIX=$(THIRD_PARTY) TARGET=$@
 
 # =================== oprofile ===================
 # NOTE: need libpopt-dev binutils-dev
