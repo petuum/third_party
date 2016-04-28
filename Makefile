@@ -133,7 +133,7 @@ gflags: path $(GFLAGS_LIB)
 
 $(GFLAGS_LIB): $(GFLAGS_SRC)
 	cd $(GFLAGS_SRC); \
-	./configure --prefix=$(THIRD_PARTY); \
+	./configure --prefix=$(THIRD_PARTY) && \
 	$(MAKE) install
 
 # ===================== glog =====================
@@ -145,21 +145,21 @@ glog: $(GLOG_LIB)
 
 $(GLOG_LIB): $(GLOG_SRC)
 	cd $(GLOG_SRC); \
-	./configure --prefix=$(THIRD_PARTY); \
+	./configure --prefix=$(THIRD_PARTY) && \
 	$(MAKE) install
 
 # ================== gperftools =================
 
-GPERFTOOLS_SRC = $(THIRD_PARTY_CENTRAL)/gperftools-2.4.tar.gz
+GPERFTOOLS_SRC = $(THIRD_PARTY_SRC)/gperftools
 GPERFTOOLS_LIB = $(THIRD_PARTY_LIB)/libtcmalloc.so
 
 gperftools: path $(GPERFTOOLS_LIB)
 
 $(GPERFTOOLS_LIB): $(GPERFTOOLS_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	./configure --prefix=$(THIRD_PARTY) --enable-frame-pointers; \
-	make install
+	cd $(GPERFTOOLS_SRC); \
+	./autogen.sh && \
+	./configure --prefix=$(THIRD_PARTY) --enable-frame-pointers && \
+	$(MAKE) install
 
 # ==================== leveldb ===================
 
