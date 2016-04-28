@@ -8,50 +8,77 @@ THIRD_PARTY_BIN = $(THIRD_PARTY)/bin
 all: third_party_all
 
 third_party_core: path \
-	                gflags \
-                  glog \
-                  gperftools \
-								  snappy \
-                  sparsehash \
-									fastapprox	\
-									yaml-cpp \
-									eigen \
-									zeromq
+	gflags \
+	glog \
+	gperftools \
+	snappy \
+	sparsehash \
+	fastapprox \
+	yaml-cpp \
+	eigen \
+	zeromq
 
 
 third_party_all: third_party_core \
-                  oprofile \
-									boost \
-                  libconfig \
-									cuckoo \
-									leveldb \
-									float_compressor
+	oprofile \
+	boost \
+	libconfig \
+	cuckoo \
+	leveldb \
+	float_compressor
 
 distclean:
 	rm -rf $(THIRD_PARTY_INCLUDE) $(THIRD_PARTY_LIB) $(THIRD_PARTY_BIN) \
-		$(THIRD_PARTY_SRC) $(THIRD_PARTY)/share
+	$(THIRD_PARTY_SRC) $(THIRD_PARTY)/share
 
 .PHONY: third_party_core third_party_all distclean
 
-path:
-	mkdir -p $(THIRD_PARTY_LIB)
-	mkdir -p $(THIRD_PARTY_INCLUDE)
-	mkdir -p $(THIRD_PARTY_BIN)
-	mkdir -p $(THIRD_PARTY_SRC)
+$(THIRD_PARTY_LIB):
+	mkdir -p $@
+
+$(THIRD_PARTY_INCLUDE):
+	mkdir -p $@
+
+$(THIRD_PARTY_BIN):
+	mkdir -p $@
+
+$(THIRD_PARTY_SRC):
+	mkdir -p $@
+
+path: $(THIRD_PARTY_LIB) \
+      $(THIRD_PARTY_INCLUDE) \
+      $(THIRD_PARTY_BIN) \
+      $(THIRD_PARTY_SRC)
 
 # ==================== boost ====================
 
-BOOST_SRC = $(THIRD_PARTY_CENTRAL)/boost_1_58_0.tar.bz2
+BOOST_MINOR_VERSION = 58
+BOOST_VERSION = 1_$(BOOST_MINOR_VERSION)_0
+BOOST_CENTRAL = $(THIRD_PARTY_CENTRAL)/boost_$(BOOST_VERSION).tar.bz2
+BOOST_SRC = $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $(BOOST_CENTRAL))))
 BOOST_INCLUDE = $(THIRD_PARTY_INCLUDE)/boost
+BOOST_B2 = $(BOOST_SRC)/b2
+
+BOOST_LIBRARIES = \
+    python \
+
+BOOST_FLAGS = $(BOOST_LIBRARIES:%=--with-% )
 
 boost: path $(BOOST_INCLUDE)
 
-$(BOOST_INCLUDE): $(BOOST_SRC)
+$(BOOST_CENTRAL):
+	wget http://downloads.sourceforge.net/project/boost/boost/1.$(BOOST_MINOR_VERSION).0/boost_1_$(BOOST_MINOR_VERSION)_0.tar.bz2 -O $(BOOST_CENTRAL)
+
+$(BOOST_SRC): $(BOOST_CENTRAL)
 	tar jxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	./bootstrap.sh \
-		--prefix=$(THIRD_PARTY); \
-	./b2 install
+
+$(BOOST_B2): $(BOOST_SRC)
+	cd $(BOOST_SRC) && \
+	./bootstrap.sh --prefix=$(THIRD_PARTY)
+
+$(BOOST_INCLUDE): $(BOOST_B2)
+	cd $(BOOST_SRC) && \
+	./b2 install -q $(BOOST_FLAGS)
 
 # ===================== cuckoo =====================
 
