@@ -4,3 +4,6 @@
 [submodule "src/fastapprox"]
 	path = src/fastapprox
 	url = https://github.com/aaiyer/fastapprox.git
+[submodule "src/gflags"]
+	path = src/gflags
+	url = https://github.com/gflags/gflags.git

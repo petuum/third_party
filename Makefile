@@ -126,16 +126,15 @@ float_compressor: path $(FC_INCLUDE)
 
 # ===================== gflags ===================
 
-GFLAGS_SRC = $(THIRD_PARTY_CENTRAL)/gflags-2.0.tar.gz
+GFLAGS_SRC = $(THIRD_PARTY_SRC)/gflags
 GFLAGS_LIB = $(THIRD_PARTY_LIB)/libgflags.so
 
 gflags: path $(GFLAGS_LIB)
 
 $(GFLAGS_LIB): $(GFLAGS_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
+	cd $(GFLAGS_SRC); \
 	./configure --prefix=$(THIRD_PARTY); \
-	make install
+	$(MAKE) install
 
 # ===================== glog =====================
 
