@@ -1,3 +1,6 @@
 [submodule "src/libcuckoo"]
 	path = src/libcuckoo
 	url = https://github.com/efficient/libcuckoo.git
+[submodule "src/fastapprox"]
+	path = src/fastapprox
+	url = https://github.com/aaiyer/fastapprox.git

@@ -97,6 +97,9 @@ EIGEN_INCLUDE = $(THIRD_PARTY_INCLUDE)/Eigen
 
 eigen: path $(EIGEN_INCLUDE)
 
+$(EIGEN_SRC):
+	wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2 -O $(EIGEN_SRC)
+
 $(EIGEN_INCLUDE): $(EIGEN_SRC)
 	tar jxf $< -C $(THIRD_PARTY_SRC)
 	cp -r $(THIRD_PARTY_SRC)/eigen-eigen-10219c95fe65/Eigen \
