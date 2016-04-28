@@ -85,12 +85,6 @@ $(BOOST_INCLUDE): $(BOOST_B2)
 CUCKOO_SRC = $(THIRD_PARTY_SRC)/libcuckoo
 CUCKOO_INCLUDE = $(THIRD_PARTY_INCLUDE)/libcuckoo
 
-$(CUCKOO_SRC):
-	cd $(THIRD_PARTY_SRC) && \
-	  git clone https://github.com/efficient/libcuckoo.git libcuckoo && \
-	  cd libcuckoo && \
-	  git checkout 99ee9348b81ad2def9fbac4676d15541adb1f748
-
 $(CUCKOO_INCLUDE): $(CUCKOO_SRC)
 	mkdir -p $@
 	cp -r $(THIRD_PARTY_SRC)/libcuckoo/src/* $(CUCKOO_INCLUDE)
