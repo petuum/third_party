@@ -165,19 +165,20 @@ $(GPERFTOOLS_LIB): $(GPERFTOOLS_SRC)
 
 LEVELDB_SRC = $(THIRD_PARTY_SRC)/leveldb
 LEVELDB_LIB = $(THIRD_PARTY_LIB)/libleveldb.so
+LEVELDB_LIB_BUILD = $(LEVELDB_SRC)/libleveldb.so
 LEVELDB_INCLUDE = $(THIRD_PARTY_INCLUDE)/leveldb
 
 leveldb: path $(LEVELDB_LIB) $(LEVELDB_INCLUDE)
 
 leveldb_build: LIBRARY_PATH=$(THIRD_PARTY_LIB):${LIBRARY_PATH}
-leveldb_build: $(LEVELDB_SRC) $(SNAPPY_LIB)
+$(LEVELDB_INCLUDE_BUILD): $(LEVELDB_SRC) $(SNAPPY_LIB)
 	$(MAKE) -C $(LEVELDB_SRC)
 
-$(LEVELDB_LIB): leveldb_build
+$(LEVELDB_LIB): $(LEVELDB_LIB_BUILD)
 	cp $(LEVELDB_SRC)/libleveldb.* $(THIRD_PARTY_LIB)
 
-$(LEVELDB_INCLUDE): leveldb_build
-	ln -s $(LEVELDB_SRC)/include $(LEVELDB_INCLUDE)
+$(LEVELDB_INCLUDE):
+	ln -s $(LEVELDB_SRC)/include $@
 
 # ==================== libconfig ===================
 
