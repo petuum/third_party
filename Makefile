@@ -206,10 +206,10 @@ YAMLCPP_MK = $(THIRD_PARTY_SRC)/yaml-cpp.mk
 YAMLCPP_LIB = $(THIRD_PARTY_LIB)/libyaml-cpp.a
 YAMLCPP_INCLUDE = $(THIRD_PARTY_INCLUDE)/yaml-cpp
 
-yaml-cpp: boost $(YAMLCPP_LIB)
+yaml-cpp: boost $(YAMLCPP_LIB) $(YAMLCPP_INCLUDE)
 
 $(YAMLCPP_INCLUDE): $(YAMLCPP_LIB)
-	ln -s $(YAMLCPP_SRC)/include $(YAMLCPP_INCLUDE)
+	ln -s $(YAMLCPP_SRC)/include/yaml-cpp $(YAMLCPP_INCLUDE)
 
 $(YAMLCPP_LIB): $(YAMLCPP_SRC)
 	cd $(YAMLCPP_SRC); \
