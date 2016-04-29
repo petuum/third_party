@@ -1,8 +1,11 @@
 lib/
 share/
-src/
 include/
 bin/
+
+src/boost_1_58_0/
+src/eigen-eigen-10219c95fe65/
+src/libconfig-1.5/
 
 # Compiled Object files
 *.slo
