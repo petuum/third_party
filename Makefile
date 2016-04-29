@@ -5,33 +5,63 @@ THIRD_PARTY_INCLUDE = $(THIRD_PARTY)/include
 THIRD_PARTY_LIB = $(THIRD_PARTY)/lib
 THIRD_PARTY_BIN = $(THIRD_PARTY)/bin
 
+BOOST_MINOR_VERSION = 58
+BOOST_VERSION = 1_$(BOOST_MINOR_VERSION)_0
+BOOST_PROJECT = boost_$(BOOST_VERSION)
+
+PROJECTS_CORE = eigen \
+	        gflags \
+	        glog \
+	        gperftools \
+	        yaml-cpp \
+	        sparsehash \
+	        snappy \
+	        libzmq
+
+PROJECTS_ALL = $(PROJECTS_CORE) \
+	       boost \
+	       leveldb \
+	       libcuckoo \
+	       libconfig \
+	       oprofile
+
+CLEAN_TARGETS = $(PROJECTS_ALL:=.clean)
+DISTCLEAN_TARGETS = $(PROJECTS_ALL:=.distclean)
+
 all: third_party_all
 
-third_party_core: path \
-	gflags \
-	glog \
-	gperftools \
-	snappy \
-	sparsehash \
-	fastapprox \
-	yaml-cpp \
-	eigen \
-	zeromq
+third_party_core: path $(PROJECTS_CORE)
 
 
 third_party_all: third_party_core \
-	oprofile \
-	boost \
-	libconfig \
-	cuckoo \
-	leveldb \
+	$(PROJECTS_ALL) \
 	float_compressor
 
-distclean:
+clean: $(CLEAN_TARGETS)
 	rm -rf $(THIRD_PARTY_INCLUDE) $(THIRD_PARTY_LIB) $(THIRD_PARTY_BIN) \
-	$(THIRD_PARTY_SRC) $(THIRD_PARTY)/share
+	   $(THIRD_PARTY)/share
+	@echo Done cleaning
 
-.PHONY: third_party_core third_party_all distclean
+distclean: $(DISTCLEAN_TARGETS)
+	@echo Done cleaning
+
+%.clean:
+	$(MAKE) -C $(patsubst %.clean,$(THIRD_PARTY_SRC)/%,$@) clean || true
+
+boost.distclean:
+	rm -rf $(BOOST_SRC)
+
+eigen.distclean:
+	rm -rf $(EIGEN_SRC)
+
+libconfig.distclean:
+	rm -rf $(LIBCONFIG_SRC)
+
+
+%.distclean:
+	$(MAKE) -C $(patsubst %.distclean,$(THIRD_PARTY_SRC)/%,$@) distclean || true
+
+.PHONY: third_party_core third_party_all clean distclean $(PROJECTS_ALL) path
 
 $(THIRD_PARTY_LIB):
 	mkdir -p $@
@@ -52,12 +82,11 @@ path: $(THIRD_PARTY_LIB) \
 
 # ==================== boost ====================
 
-BOOST_MINOR_VERSION = 58
-BOOST_VERSION = 1_$(BOOST_MINOR_VERSION)_0
 BOOST_CENTRAL = $(THIRD_PARTY_CENTRAL)/boost_$(BOOST_VERSION).tar.bz2
-BOOST_SRC = $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $(BOOST_CENTRAL))))
+BOOST_SRC = $(THIRD_PARTY_SRC)/boost
 BOOST_INCLUDE = $(THIRD_PARTY_INCLUDE)/boost
 BOOST_B2 = $(BOOST_SRC)/b2
+BOOST_BOOTSTRAP = $(BOOST_SRC)/bootstrap.sh
 
 BOOST_LIBRARIES = \
     python \
@@ -69,16 +98,24 @@ boost: path $(BOOST_INCLUDE)
 $(BOOST_CENTRAL):
 	wget http://downloads.sourceforge.net/project/boost/boost/1.$(BOOST_MINOR_VERSION).0/boost_1_$(BOOST_MINOR_VERSION)_0.tar.bz2 -O $(BOOST_CENTRAL)
 
-$(BOOST_SRC): $(BOOST_CENTRAL)
-	tar jxf $< -C $(THIRD_PARTY_SRC)
+$(BOOST_SRC): $(BOOST_BOOTSTRAP)
 
-$(BOOST_B2): $(BOOST_SRC)
+$(BOOST_BOOTSTRAP): $(BOOST_CENTRAL)
+	if [ ! -d $(BOOST_SRC) ]; then \
+	  tar jxf $< -C $(THIRD_PARTY_SRC) && \
+	  mv $(THIRD_PARTY_SRC)/$(BOOST_PROJECT) $(BOOST_SRC) ; \
+	fi
+	touch $@
+
+$(BOOST_B2): $(BOOST_BOOTSTRAP)
 	cd $(BOOST_SRC) && \
 	./bootstrap.sh --prefix=$(THIRD_PARTY)
+	touch $@
 
 $(BOOST_INCLUDE): $(BOOST_B2)
 	cd $(BOOST_SRC) && \
 	./b2 install -q $(BOOST_FLAGS)
+	touch $@
 
 # ===================== cuckoo =====================
 
@@ -88,21 +125,25 @@ CUCKOO_INCLUDE = $(THIRD_PARTY_INCLUDE)/libcuckoo
 $(CUCKOO_INCLUDE): $(CUCKOO_SRC)
 	ln -s $(CUCKOO_SRC)/src $@
 
-cuckoo: path $(CUCKOO_INCLUDE)
+libcuckoo: path $(CUCKOO_INCLUDE)
 
 # ==================== eigen ====================
 
-EIGEN_SRC = $(THIRD_PARTY_CENTRAL)/eigen-3.2.4.tar.bz2
+EIGEN_CENTRAL = $(THIRD_PARTY_CENTRAL)/eigen-3.2.4.tar.bz2
+EIGEN_SRC = $(THIRD_PARTY_SRC)/eigen
 EIGEN_INCLUDE = $(THIRD_PARTY_INCLUDE)/Eigen
 
 eigen: path $(EIGEN_INCLUDE)
 
-$(EIGEN_SRC):
-	wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2 -O $(EIGEN_SRC)
+$(EIGEN_CENTRAL):
+	wget http://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2 -O $(EIGEN_CENTRAL)
+
+$(EIGEN_SRC): $(EIGEN_CENTRAL)
+	tar jxf $< -C $(THIRD_PARTY_SRC)
+	mv $(THIRD_PARTY_SRC)/eigen* $(EIGEN_SRC)
 
 $(EIGEN_INCLUDE): $(EIGEN_SRC)
-	tar jxf $< -C $(THIRD_PARTY_SRC)
-	cp -r $(THIRD_PARTY_SRC)/eigen-eigen-10219c95fe65/Eigen \
+	cp -r $(EIGEN_SRC)/Eigen \
 		$(THIRD_PARTY_INCLUDE)/
 
 # ==================== fastapprox ===================
@@ -164,17 +205,14 @@ $(GPERFTOOLS_LIB): $(GPERFTOOLS_SRC)
 # ==================== leveldb ===================
 
 LEVELDB_SRC = $(THIRD_PARTY_SRC)/leveldb
-LEVELDB_LIB = $(THIRD_PARTY_LIB)/libleveldb.so
-LEVELDB_LIB_BUILD = $(LEVELDB_SRC)/libleveldb.so
+LEVELDB_LIB = $(THIRD_PARTY_LIB)/libleveldb.a
+LEVELDB_LIB_BUILD = $(LEVELDB_SRC)/libleveldb.a
 LEVELDB_INCLUDE = $(THIRD_PARTY_INCLUDE)/leveldb
 
 leveldb: path $(LEVELDB_LIB) $(LEVELDB_INCLUDE)
 
-leveldb_build: LIBRARY_PATH=$(THIRD_PARTY_LIB):${LIBRARY_PATH}
-$(LEVELDB_INCLUDE_BUILD): $(LEVELDB_SRC) $(SNAPPY_LIB)
-	$(MAKE) -C $(LEVELDB_SRC)
-
-$(LEVELDB_LIB): $(LEVELDB_LIB_BUILD)
+$(LEVELDB_LIB):
+	LIBRARY_PATH=$(THIRD_PARTY_LIB):${LIBRARY_PATH} $(MAKE) -C $(LEVELDB_SRC)
 	cp $(LEVELDB_SRC)/libleveldb.* $(THIRD_PARTY_LIB)
 
 $(LEVELDB_INCLUDE):
@@ -182,17 +220,19 @@ $(LEVELDB_INCLUDE):
 
 # ==================== libconfig ===================
 
-LIBCONFIG_TAR = $(THIRD_PARTY_CENTRAL)/libconfig-1.5.tar.gz
-LIBCONFIG_SRC = $(THIRD_PARTY_SRC)/libconfig-1.5
+LIBCONFIG_VERSION = 1.5
+LIBCONFIG_TAR = $(THIRD_PARTY_CENTRAL)/libconfig-$(LIBCONFIG_VERSION).tar.gz
+LIBCONFIG_SRC = $(THIRD_PARTY_SRC)/libconfig
 LIBCONFIG_LIB = $(THIRD_PARTY_LIB)/libconfig++.so
 
 libconfig: path $(LIBCONFIG_LIB)
 
 $(LIBCONFIG_TAR):
-	wget http://www.hyperrealm.com/libconfig/libconfig-1.5.tar.gz -O $@
+	wget http://www.hyperrealm.com/libconfig/libconfig-$(LIBCONFIG_VERSION).tar.gz -O $@
 
 $(LIBCONFIG_SRC): $(LIBCONFIG_TAR)
 	tar xf $< -C $(THIRD_PARTY_SRC)
+	mv $(LIBCONFIG_SRC)-$(LIBCONFIG_VERSION) $(LIBCONFIG_SRC)
 
 $(LIBCONFIG_LIB): $(LIBCONFIG_SRC)
 	cd $(LIBCONFIG_SRC) && \
@@ -209,7 +249,7 @@ YAMLCPP_INCLUDE = $(THIRD_PARTY_INCLUDE)/yaml-cpp
 yaml-cpp: boost $(YAMLCPP_LIB) $(YAMLCPP_INCLUDE)
 
 $(YAMLCPP_INCLUDE): $(YAMLCPP_LIB)
-	ln -s $(YAMLCPP_SRC)/include/yaml-cpp $(YAMLCPP_INCLUDE)
+	cp -r $(YAMLCPP_SRC)/include/yaml-cpp $(YAMLCPP_INCLUDE)
 
 $(YAMLCPP_LIB): $(YAMLCPP_SRC)
 	cd $(YAMLCPP_SRC); \
@@ -254,16 +294,17 @@ $(SNAPPY_LIB): $(SNAPPY_SRC)
 	./configure --prefix=$(THIRD_PARTY) && \
 	$(MAKE) install
 
-# ==================== zeromq ====================
+# ==================== libzmq ====================
 
 ZMQ_SRC = $(THIRD_PARTY_SRC)/libzmq
+ZMQ_HEADER_SRC = $(THIRD_PARTY_SRC)/zmq.hpp
 ZMQ_LIB = $(THIRD_PARTY_LIB)/libzmq.so
 ZMQ_CPP_HEADER = $(THIRD_PARTY_INCLUDE)/zmq.hpp
 
-zeromq: path $(ZMQ_LIB) $(ZMQ_CPP_HEADER)
+libzmq: path $(ZMQ_CPP_HEADER) $(ZMQ_LIB)
 
-$(ZMQ_CPP_HEADER):
-	wget https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp -O $@
+$(ZMQ_CPP_HEADER): $(ZMQ_HEADER_SRC)
+	cp $< $@
 
 $(ZMQ_LIB): $(ZMQ_SRC)
 	cd $(ZMQ_SRC); \
