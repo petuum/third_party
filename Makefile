@@ -219,11 +219,11 @@ $(YAMLCPP_LIB): $(YAMLCPP_SRC)
 # NOTE: need libpopt-dev binutils-dev
 
 OPROFILE_SRC = $(THIRD_PARTY_SRC)/oprofile
-OPROFILE_LIB = $(THIRD_PARTY_LIB)/libprofiler.so
+OPROFILE_TARGET = $(OPROFILE_SRC)/pp/opreport
 
-oprofile: path $(OPROFILE_LIB)
+oprofile: path $(OPROFILE_TARGET)
 
-$(OPROFILE_LIB): $(OPROFILE_SRC)
+$(OPROFILE_TARGET): $(OPROFILE_SRC)
 	cd $(OPROFILE_SRC); \
 	./autogen.sh && \
 	./configure --prefix=$(THIRD_PARTY) && \
