@@ -23,6 +23,7 @@ PROJECTS_ALL = $(PROJECTS_CORE) \
 	       leveldb \
 	       libcuckoo \
 	       libconfig \
+	       lmdb \
 	       oprofile
 
 CLEAN_TARGETS = $(PROJECTS_ALL:=.clean)
@@ -312,3 +313,12 @@ $(ZMQ_LIB): $(ZMQ_SRC)
 	./configure --prefix=$(THIRD_PARTY); \
 	$(MAKE) install
 
+# ==================== snappy ===================
+
+LMDB_SRC = $(THIRD_PARTY_SRC)/lmdb/libraries/liblmdb
+LMDB_LIB = $(THIRD_PARTY_LIB)/liblmdb.so
+
+lmdb: path $(LMDB_LIB)
+
+$(LMDB_LIB): $(LMDB_SRC)
+	$(MAKE) -C $(LMDB_SRC) prefix=$(THIRD_PARTY) install

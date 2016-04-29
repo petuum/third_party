@@ -34,3 +34,6 @@
 [submodule "src/libzmq"]
 	path = src/libzmq
 	url = https://github.com/zeromq/zeromq3-x.git
+[submodule "src/lmdb"]
+	path = src/lmdb
+	url = https://github.com/LMDB/lmdb.git
