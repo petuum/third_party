@@ -256,15 +256,18 @@ $(SNAPPY_LIB): $(SNAPPY_SRC)
 
 # ==================== zeromq ====================
 
-ZMQ_SRC = $(THIRD_PARTY_CENTRAL)/zeromq-3.2.5.tar.gz
+ZMQ_SRC = $(THIRD_PARTY_SRC)/libzmq
 ZMQ_LIB = $(THIRD_PARTY_LIB)/libzmq.so
+ZMQ_CPP_HEADER = $(THIRD_PARTY_INCLUDE)/zmq.hpp
 
-zeromq: path $(ZMQ_LIB)
+zeromq: path $(ZMQ_LIB) $(ZMQ_CPP_HEADER)
+
+$(ZMQ_CPP_HEADER):
+	wget https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp -O $@
 
 $(ZMQ_LIB): $(ZMQ_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
+	cd $(ZMQ_SRC); \
+	./autogen.sh && \
 	./configure --prefix=$(THIRD_PARTY); \
-	make install
-	cp $(THIRD_PARTY_CENTRAL)/zmq.hpp $(THIRD_PARTY_INCLUDE)
+	$(MAKE) install
 
