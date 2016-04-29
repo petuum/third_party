@@ -25,3 +25,6 @@
 [submodule "src/oprofile"]
 	path = src/oprofile
 	url = git://git.code.sf.net/p/oprofile/oprofile
+[submodule "src/sparsehash"]
+	path = src/sparsehash
+	url = https://github.com/sparsehash/sparsehash.git

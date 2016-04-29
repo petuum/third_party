@@ -231,16 +231,15 @@ $(OPROFILE_LIB): $(OPROFILE_SRC)
 
 # ================== sparsehash ==================
 
-SPARSEHASH_SRC = $(THIRD_PARTY_CENTRAL)/sparsehash-2.0.2.tar.gz
+SPARSEHASH_SRC = $(THIRD_PARTY_SRC)/sparsehash
 SPARSEHASH_INCLUDE = $(THIRD_PARTY_INCLUDE)/sparsehash
 
 sparsehash: path $(SPARSEHASH_INCLUDE)
 
 $(SPARSEHASH_INCLUDE): $(SPARSEHASH_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	./configure --prefix=$(THIRD_PARTY); \
-	make install
+	cd $(SPARSEHASH_SRC); \
+	./configure --prefix=$(THIRD_PARTY) && \
+	$(MAKE) install
 
 # ==================== snappy ===================
 
