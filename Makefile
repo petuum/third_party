@@ -91,6 +91,8 @@ BOOST_BOOTSTRAP = $(BOOST_SRC)/bootstrap.sh
 
 BOOST_LIBRARIES = \
     python \
+    thread \
+    system \
 
 BOOST_FLAGS = $(BOOST_LIBRARIES:%=--with-% )
 
