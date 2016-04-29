@@ -243,16 +243,16 @@ $(SPARSEHASH_INCLUDE): $(SPARSEHASH_SRC)
 
 # ==================== snappy ===================
 
-SNAPPY_SRC = $(THIRD_PARTY_CENTRAL)/snappy-1.1.2.tar.gz
+SNAPPY_SRC = $(THIRD_PARTY_SRC)/snappy
 SNAPPY_LIB = $(THIRD_PARTY_LIB)/libsnappy.so
 
 snappy: path $(SNAPPY_LIB)
 
 $(SNAPPY_LIB): $(SNAPPY_SRC)
-	tar zxf $< -C $(THIRD_PARTY_SRC)
-	cd $(basename $(basename $(THIRD_PARTY_SRC)/$(notdir $<))); \
-	./configure --prefix=$(THIRD_PARTY); \
-	make install
+	cd $(SNAPPY_SRC); \
+	./autogen.sh && \
+	./configure --prefix=$(THIRD_PARTY) && \
+	$(MAKE) install
 
 # ==================== zeromq ====================
 

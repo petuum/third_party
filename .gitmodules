@@ -28,3 +28,9 @@
 [submodule "src/sparsehash"]
 	path = src/sparsehash
 	url = https://github.com/sparsehash/sparsehash.git
+[submodule "src/snappy"]
+	path = src/snappy
+	url = https://github.com/google/snappy.git
+[submodule "src/libzmq"]
+	path = src/libzmq
+	url = https://github.com/zeromq/libzmq.git
